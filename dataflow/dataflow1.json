@@ -11,6 +11,14 @@
 					},
 					"name": "import1",
 					"description": "financial import from santander"
+				},
+				{
+					"dataset": {
+						"referenceName": "Financials_table",
+						"type": "DatasetReference"
+					},
+					"name": "import2",
+					"description": "financial table containing data"
 				}
 			],
 			"sinks": [],
@@ -26,7 +34,9 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
-				"     moveFiles: ['','']) ~> import1"
+				"     moveFiles: ['','']) ~> import1",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> "
 			]
 		}
 	}
