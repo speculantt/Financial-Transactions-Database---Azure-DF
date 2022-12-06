@@ -1,0 +1,42 @@
+{
+	"name": "financialimport1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureFileStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": "Movimientos",
+			"location": {
+				"type": "AzureFileStorageLocation",
+				"fileName": "export2022126 (2).xls"
+			},
+			"range": "A8:E80",
+			"firstRowAsHeader": true
+		},
+		"schema": [
+			{
+				"name": "FECHA OPERACIÓN",
+				"type": "String"
+			},
+			{
+				"name": "FECHA VALOR",
+				"type": "String"
+			},
+			{
+				"name": "CONCEPTO",
+				"type": "String"
+			},
+			{
+				"name": "IMPORTE EUR",
+				"type": "String"
+			},
+			{
+				"name": "SALDO",
+				"type": "String"
+			}
+		]
+	}
+}
