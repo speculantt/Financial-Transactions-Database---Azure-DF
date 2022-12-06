@@ -1,5 +1,5 @@
 {
-	"name": "Financials_table",
+	"name": "Fin_table",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureTableStorage1",
