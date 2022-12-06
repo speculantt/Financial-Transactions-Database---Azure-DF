@@ -25,7 +25,8 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> import1"
+				"     ignoreNoFilesFound: false,",
+				"     moveFiles: ['','']) ~> import1"
 			]
 		}
 	}
