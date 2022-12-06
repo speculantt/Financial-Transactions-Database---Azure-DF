@@ -1,0 +1,9 @@
+{
+	"name": "DataFactoryValeriy",
+	"location": "westeurope",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "d9e60095-e920-4f8e-a47d-78a279f1fd79",
+		"tenantId": "d5d35902-0c0c-451a-82ac-2e68d6503858"
+	}
+}
