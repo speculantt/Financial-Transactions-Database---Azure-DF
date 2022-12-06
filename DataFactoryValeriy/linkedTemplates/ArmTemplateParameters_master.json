@@ -8,6 +8,9 @@
 		"AzureFileStorage1_connectionString": {
 			"value": ""
 		},
+		"AzureTableStorage1_connectionString": {
+			"value": ""
+		},
 		"containerUri": {
 			"value": ""
 		},
