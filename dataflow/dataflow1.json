@@ -11,10 +11,6 @@
 					},
 					"name": "import1",
 					"description": "financial import from santander"
-				},
-				{
-					"name": "import2",
-					"description": "financial table containing data"
 				}
 			],
 			"sinks": [],
@@ -30,9 +26,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
-				"     moveFiles: ['','']) ~> import1",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> "
+				"     moveFiles: ['','']) ~> import1"
 			]
 		}
 	}
