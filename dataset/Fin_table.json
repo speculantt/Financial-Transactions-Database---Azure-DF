@@ -7,7 +7,6 @@
 		},
 		"annotations": [],
 		"type": "AzureTable",
-		"schema": [],
 		"typeProperties": {
 			"tableName": "Financialstotal"
 		}
