@@ -31,7 +31,8 @@
 				"     ignoreNoFilesFound: false,",
 				"     moveFiles: ['','']) ~> import1",
 				"source(allowSchemaDrift: false,",
-				"     validateSchema: false) ~> source1"
+				"     validateSchema: false,",
+				"     limit: 100) ~> source1"
 			]
 		}
 	}
