@@ -1,0 +1,32 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "financialimport1",
+						"type": "DatasetReference"
+					},
+					"name": "import1",
+					"description": "financial import from santander"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          {FECHA OPERACIÓN} as string,",
+				"          {FECHA VALOR} as string,",
+				"          CONCEPTO as string,",
+				"          {IMPORTE EUR} as string,",
+				"          SALDO as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> import1"
+			]
+		}
+	}
+}
