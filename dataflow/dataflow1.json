@@ -13,10 +13,6 @@
 					"description": "financial import from santander"
 				},
 				{
-					"dataset": {
-						"referenceName": "Financials_table",
-						"type": "DatasetReference"
-					},
 					"name": "import2",
 					"description": "financial table containing data"
 				}
