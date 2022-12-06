@@ -7,6 +7,20 @@
 		},
 		"annotations": [],
 		"type": "AzureTable",
+		"structure": [
+			{
+				"name": "PartitionKey",
+				"type": "String"
+			},
+			{
+				"name": "RowKey",
+				"type": "String"
+			},
+			{
+				"name": "Timestamp",
+				"type": "DateTimeOffset"
+			}
+		],
 		"typeProperties": {
 			"tableName": "Financialstotal"
 		}
