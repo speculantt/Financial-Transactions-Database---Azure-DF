@@ -13,8 +13,7 @@
 					"description": "financial import from santander"
 				},
 				{
-					"name": "commontable",
-					"description": "table with all the transactions data"
+					"name": "commontable"
 				}
 			],
 			"sinks": [],
@@ -31,8 +30,9 @@
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
 				"     moveFiles: ['','']) ~> import1",
-				"source(allowSchemaDrift: false,",
-				"     validateSchema: false) ~> commontable"
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     inferDriftedColumnTypes: true) ~> commontable"
 			]
 		}
 	}
