@@ -1,5 +1,5 @@
 {
-	"name": "financialimport1",
+	"name": "File_import",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureFileStorage1",
