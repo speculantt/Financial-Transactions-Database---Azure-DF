@@ -11,9 +11,6 @@
 					},
 					"name": "import1",
 					"description": "financial import from santander"
-				},
-				{
-					"name": "source1"
 				}
 			],
 			"sinks": [],
@@ -29,9 +26,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
-				"     moveFiles: ['','']) ~> import1",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source1"
+				"     moveFiles: ['','']) ~> import1"
 			]
 		}
 	}
