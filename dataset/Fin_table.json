@@ -19,6 +19,26 @@
 			{
 				"name": "Timestamp",
 				"type": "DateTimeOffset"
+			},
+			{
+				"name": "Amount",
+				"type": "Double"
+			},
+			{
+				"name": "Balance",
+				"type": "Double"
+			},
+			{
+				"name": "DateEffective",
+				"type": "String"
+			},
+			{
+				"name": "DateOperation",
+				"type": "String"
+			},
+			{
+				"name": "Description",
+				"type": "String"
 			}
 		],
 		"typeProperties": {
