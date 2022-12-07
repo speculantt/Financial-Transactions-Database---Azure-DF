@@ -11,9 +11,17 @@
 					},
 					"name": "import1",
 					"description": "financial import from santander"
+				},
+				{
+					"name": "source1",
+					"description": "financial import from santander"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"name": "sink1"
+				}
+			],
 			"transformations": [],
 			"scriptLines": [
 				"source(output(",
@@ -26,7 +34,13 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
-				"     moveFiles: ['','']) ~> import1"
+				"     moveFiles: ['','']) ~> import1",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> source1",
+				"import1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
