@@ -20,18 +20,10 @@
 					"name": "csvdatabasefile"
 				}
 			],
-			"sinks": [
-				{
-					"dataset": {
-						"referenceName": "fulldatabasefile",
-						"type": "DatasetReference"
-					},
-					"name": "sink1"
-				}
-			],
+			"sinks": [],
 			"transformations": [
 				{
-					"name": "Source",
+					"name": "AddSource1",
 					"description": "Adding source column"
 				},
 				{
@@ -45,7 +37,16 @@
 					"name": "FilterNulls"
 				},
 				{
-					"name": "rank1"
+					"name": "AddKey1"
+				},
+				{
+					"name": "union1"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "split1"
 				}
 			],
 			"scriptLines": [
@@ -70,23 +71,25 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> csvdatabasefile",
-				"csvdatabasefile derive(Source = 'existing') ~> Source",
+				"csvdatabasefile derive(Source = 'existing') ~> AddSource1",
 				"NewFile derive(Source = 'NewFile') ~> AddSource",
 				"AddSource derive(Key = crc32(concat({FECHA OPERACIÓN},{FECHA VALOR},{IMPORTE EUR},{SALDO}))) ~> AddKey",
 				"AddKey filter(or(not(isNull({FECHA OPERACIÓN})),not(isNull({IMPORTE EUR})))) ~> FilterNulls",
-				"FilterNulls rank(asc(Key, true),",
-				"     output(Rank as long)) ~> rank1",
-				"Source sink(allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     input(",
-				"          DateOperation as string,",
-				"          DateEffective as string,",
-				"          Description as string,",
-				"          Amount as string,",
-				"          Saldo as string",
+				"AddSource1 derive(Key = crc32(concat(DateOperation,DateEffective,Amount,Saldo))) ~> AddKey1",
+				"AddKey1, select1 union(byName: true)~> union1",
+				"FilterNulls select(mapColumn(",
+				"          DateOperation = {FECHA OPERACIÓN},",
+				"          DateEffective = {FECHA VALOR},",
+				"          Description = CONCEPTO,",
+				"          Amount = {IMPORTE EUR},",
+				"          Saldo = SALDO,",
+				"          Source,",
+				"          Key",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sink1"
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"union1 split(ERROR_FUNCTION(''),",
+				"     disjoint: false) ~> split1@(, )"
 			]
 		}
 	}
