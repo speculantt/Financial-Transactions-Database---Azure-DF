@@ -35,17 +35,17 @@
 					"description": "Adding source column"
 				},
 				{
-					"name": "Source1",
+					"name": "AddSource",
 					"description": "Adding source column"
 				},
 				{
-					"name": "derivedColumn1"
+					"name": "FormatColumns"
 				},
 				{
-					"name": "cast1"
+					"name": "RenameColumns"
 				},
 				{
-					"name": "select1"
+					"name": "AddKey"
 				}
 			],
 			"scriptLines": [
@@ -71,8 +71,7 @@
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> csvdatabasefile",
 				"csvdatabasefile derive(Source = 'existing') ~> Source",
-				"select1 derive(Source = 'NewFile') ~> Source1",
-				"Source1 derive(Key = crc32(concat(DateOperation,DateEffective,Amount,Saldo))) ~> derivedColumn1",
+				"RenameColumns derive(Source = 'NewFile') ~> AddSource",
 				"NewFile cast(output(",
 				"          {FECHA OPERACIÓN} as date 'yyyy-MM-dd',",
 				"          {FECHA VALOR} as date 'yyyy-MM-dd',",
@@ -80,8 +79,8 @@
 				"          {IMPORTE EUR} as double,",
 				"          SALDO as double",
 				"     ),",
-				"     errors: true) ~> cast1",
-				"cast1 select(mapColumn(",
+				"     errors: true) ~> FormatColumns",
+				"FormatColumns select(mapColumn(",
 				"          DateOperation = {FECHA OPERACIÓN},",
 				"          DateEffective = {FECHA VALOR},",
 				"          Description = CONCEPTO,",
@@ -89,7 +88,8 @@
 				"          Saldo = SALDO",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1",
+				"     skipDuplicateMapOutputs: true) ~> RenameColumns",
+				"AddSource derive(Key = ERROR_FUNCTION('')) ~> AddKey",
 				"Source sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
