@@ -45,7 +45,7 @@
 					"name": "select1"
 				},
 				{
-					"name": "select2"
+					"name": "cast1"
 				}
 			],
 			"scriptLines": [
@@ -89,17 +89,10 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
-				"mapkeycolumn select(mapColumn(",
-				"          DateOperation,",
-				"          DateEffective,",
-				"          Description,",
-				"          Amount,",
-				"          Saldo,",
-				"          Key,",
-				"          mapkey",
+				"mapkeycolumn cast(output(",
+				"          mapkey as long",
 				"     ),",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select2",
+				"     errors: true) ~> cast1",
 				"select1 sink(validateSchema: false,",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
