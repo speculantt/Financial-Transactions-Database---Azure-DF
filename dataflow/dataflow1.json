@@ -23,6 +23,13 @@
 			"sinks": [
 				{
 					"name": "cachenewfilekey"
+				},
+				{
+					"dataset": {
+						"referenceName": "fulldatabasefile",
+						"type": "DatasetReference"
+					},
+					"name": "WriteDown"
 				}
 			],
 			"transformations": [
@@ -55,6 +62,9 @@
 				},
 				{
 					"name": "lookup1"
+				},
+				{
+					"name": "alterRow1"
 				}
 			],
 			"scriptLines": [
@@ -116,6 +126,8 @@
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> lookup1",
+				"lookup1 alterRow(updateIf(and(Key==NewFileKey, Source=='database')),",
+				"     insertIf(Source=='newfile')) ~> alterRow1",
 				"select1 sink(validateSchema: false,",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
@@ -126,7 +138,18 @@
 				"     saveOrder: 1,",
 				"     mapColumn(",
 				"          Key = NewFileKey",
-				"     )) ~> cachenewfilekey"
+				"     )) ~> cachenewfilekey",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          DateOperation as string,",
+				"          DateEffective as string,",
+				"          Description as string,",
+				"          Amount as string,",
+				"          Saldo as string",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> WriteDown"
 			]
 		}
 	}
