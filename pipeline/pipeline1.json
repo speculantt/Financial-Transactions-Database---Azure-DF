@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Data flow1",
+				"name": "DataUploadtoAzure",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
