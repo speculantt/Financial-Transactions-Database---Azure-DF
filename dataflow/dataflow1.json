@@ -9,20 +9,24 @@
 						"referenceName": "File_import",
 						"type": "DatasetReference"
 					},
-					"name": "import1",
+					"name": "NewFile",
 					"description": "financial import from santander"
 				},
 				{
-					"name": "source1",
+					"dataset": {
+						"referenceName": "FullDatabaseFile",
+						"type": "DatasetReference"
+					},
+					"name": "FullDatabaseFile",
 					"description": "financial import from santander"
 				}
 			],
-			"sinks": [
+			"sinks": [],
+			"transformations": [
 				{
-					"name": "sink1"
+					"name": "Source"
 				}
 			],
-			"transformations": [],
 			"scriptLines": [
 				"source(output(",
 				"          {FECHA OPERACIÓN} as string,",
@@ -34,13 +38,18 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
-				"     moveFiles: ['','']) ~> import1",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> source1",
-				"import1 sink(allowSchemaDrift: true,",
+				"     moveFiles: ['','']) ~> NewFile",
+				"source(output(",
+				"          DateOperation as string,",
+				"          DateEffective as string,",
+				"          Description as string,",
+				"          Amount as string,",
+				"          Saldo as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sink1"
+				"     ignoreNoFilesFound: false) ~> FullDatabaseFile",
+				"FullDatabaseFile derive(Source = 'existing') ~> Source"
 			]
 		}
 	}
