@@ -66,9 +66,6 @@
 				},
 				{
 					"name": "UpdateInsert"
-				},
-				{
-					"name": "SelectToWrite"
 				}
 			],
 			"scriptLines": [
@@ -132,16 +129,7 @@
 				"     broadcast: 'auto')~> LookupKey",
 				"LookupKey alterRow(updateIf(and(Key==NewFileKey,Source=='database')),",
 				"     insertIf(Source=='newfile')) ~> UpdateInsert",
-				"UpdateInsert select(mapColumn(",
-				"          DateOperation,",
-				"          DateEffective,",
-				"          Description,",
-				"          Amount,",
-				"          Saldo",
-				"     ),",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> SelectToWrite",
-				"SelectToWrite sink(allowSchemaDrift: false,",
+				"UpdateInsert sink(allowSchemaDrift: false,",
 				"     validateSchema: false,",
 				"     input(",
 				"          DateOperation as string,",
@@ -153,7 +141,14 @@
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
 				"     outputAssertFailedRows: true,",
-				"     assertFailure_container: 'blobcontainer') ~> WriteDown"
+				"     assertFailure_container: 'blobcontainer',",
+				"     mapColumn(",
+				"          DateOperation,",
+				"          DateEffective,",
+				"          Description,",
+				"          Amount,",
+				"          Saldo",
+				"     )) ~> WriteDown"
 			]
 		}
 	}
