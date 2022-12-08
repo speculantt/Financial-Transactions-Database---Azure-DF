@@ -11,7 +11,8 @@
 			"location": {
 				"type": "AzureBlobStorageLocation",
 				"fileName": "fulldatabasefile.csv",
-				"container": "databasefile"
+				"folderPath": "DatabaseFile",
+				"container": "blobcontainer"
 			},
 			"columnDelimiter": ",",
 			"escapeChar": "\\",
