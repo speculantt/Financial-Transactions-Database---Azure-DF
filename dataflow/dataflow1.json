@@ -35,7 +35,13 @@
 					"name": "RenameColumns"
 				},
 				{
-					"name": "mapkeycolumn"
+					"name": "union1"
+				},
+				{
+					"name": "derivedColumn1"
+				},
+				{
+					"name": "derivedColumn2"
 				}
 			],
 			"scriptLines": [
@@ -61,7 +67,7 @@
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> csvdatabasefile",
 				"NewFile derive(Key = crc32(concat({FECHA OPERACIÓN},{FECHA VALOR},{IMPORTE EUR},{SALDO}))) ~> AddKey",
-				"AddKey filter(or(not(isNull({FECHA OPERACIÓN})),not(isNull({IMPORTE EUR})))) ~> FilterNulls",
+				"derivedColumn1 filter(or(not(isNull({FECHA OPERACIÓN})),not(isNull({IMPORTE EUR})))) ~> FilterNulls",
 				"csvdatabasefile derive(Key = crc32(concat(DateOperation,DateEffective,Amount,Saldo))) ~> AddKey1",
 				"FilterNulls select(mapColumn(",
 				"          DateOperation = {FECHA OPERACIÓN},",
@@ -69,11 +75,14 @@
 				"          Description = CONCEPTO,",
 				"          Amount = {IMPORTE EUR},",
 				"          Saldo = SALDO,",
-				"          Key",
+				"          Key,",
+				"          Source",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> RenameColumns",
-				"AddKey1 derive(mapkey = iif(isNull(newfilecache#lookup(Key)), 'keep', 'upd')) ~> mapkeycolumn"
+				"derivedColumn2, RenameColumns union(byName: true)~> union1",
+				"AddKey derive(Source = 'newfile') ~> derivedColumn1",
+				"AddKey1 derive(Source = 'database') ~> derivedColumn2"
 			]
 		}
 	}
