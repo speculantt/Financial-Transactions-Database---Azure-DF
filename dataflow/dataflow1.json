@@ -22,13 +22,6 @@
 			],
 			"sinks": [
 				{
-					"dataset": {
-						"referenceName": "fulldatabasefile",
-						"type": "DatasetReference"
-					},
-					"name": "sink1"
-				},
-				{
 					"name": "newfilecache"
 				}
 			],
@@ -43,13 +36,7 @@
 					"name": "AddKey1"
 				},
 				{
-					"name": "union1"
-				},
-				{
 					"name": "RenameColumns"
-				},
-				{
-					"name": "alterRow1"
 				},
 				{
 					"name": "mapkeycolumn"
@@ -86,7 +73,6 @@
 				"NewFile derive(Key = crc32(concat({FECHA OPERACIÓN},{FECHA VALOR},{IMPORTE EUR},{SALDO}))) ~> AddKey",
 				"AddKey filter(or(not(isNull({FECHA OPERACIÓN})),not(isNull({IMPORTE EUR})))) ~> FilterNulls",
 				"csvdatabasefile derive(Key = crc32(concat(DateOperation,DateEffective,Amount,Saldo))) ~> AddKey1",
-				"RenameColumns, select2 union(byName: true)~> union1",
 				"FilterNulls select(mapColumn(",
 				"          DateOperation = {FECHA OPERACIÓN},",
 				"          DateEffective = {FECHA VALOR},",
@@ -97,7 +83,6 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> RenameColumns",
-				"union1 alterRow(upsertIf(true())) ~> alterRow1",
 				"AddKey1 derive(mapkey = newfilecache#lookup(Key)) ~> mapkeycolumn",
 				"RenameColumns select(mapColumn(",
 				"          Key",
@@ -115,17 +100,6 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select2",
-				"alterRow1 sink(allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     input(",
-				"          DateOperation as string,",
-				"          DateEffective as string,",
-				"          Description as string,",
-				"          Amount as string,",
-				"          Saldo as string",
-				"     ),",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> sink1",
 				"select1 sink(validateSchema: false,",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
@@ -133,7 +107,7 @@
 				"     store: 'cache',",
 				"     format: 'inline',",
 				"     output: false,",
-				"     saveOrder: 1) ~> newfilecache"
+				"     saveOrder: 0) ~> newfilecache"
 			]
 		}
 	}
