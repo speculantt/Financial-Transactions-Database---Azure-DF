@@ -10,10 +10,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "export2022126 (2).xls",
+				"fileName": "testexport.xls",
 				"container": "blobcontainer"
 			},
-			"sheetIndex": 0,
+			"sheetIndex": 1,
 			"range": "A8:E180",
 			"firstRowAsHeader": true
 		},
