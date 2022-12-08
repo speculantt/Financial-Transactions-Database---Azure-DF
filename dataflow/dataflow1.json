@@ -54,7 +54,7 @@
 					"name": "PrepForUnion"
 				},
 				{
-					"name": "derivedColumn3"
+					"name": "lookup1"
 				}
 			],
 			"scriptLines": [
@@ -97,7 +97,7 @@
 				"AddKey derive(Source = 'newfile') ~> derivedColumn1",
 				"AddKey1 derive(Source = 'database') ~> derivedColumn2",
 				"RenameColumns select(mapColumn(",
-				"          Key",
+				"          NewFileKey = Key",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
@@ -112,7 +112,10 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> PrepForUnion",
-				"union1 derive(Action = cachenewfilekey#lookup(Key)) ~> derivedColumn3",
+				"union1, select1 lookup(Key == NewFileKey,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookup1",
 				"select1 sink(validateSchema: false,",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
@@ -122,7 +125,7 @@
 				"     output: false,",
 				"     saveOrder: 1,",
 				"     mapColumn(",
-				"          Key",
+				"          Key = NewFileKey",
 				"     )) ~> cachenewfilekey"
 			]
 		}
