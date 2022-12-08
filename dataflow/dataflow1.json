@@ -22,6 +22,10 @@
 			],
 			"sinks": [
 				{
+					"dataset": {
+						"referenceName": "fulldatabasefile",
+						"type": "DatasetReference"
+					},
 					"name": "sink1"
 				}
 			],
@@ -61,6 +65,13 @@
 				"NewFile derive(Source = 'NewFile') ~> Source1",
 				"Source sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     input(",
+				"          DateOperation as string,",
+				"          DateEffective as string,",
+				"          Description as string,",
+				"          Amount as string,",
+				"          Saldo as string",
+				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]

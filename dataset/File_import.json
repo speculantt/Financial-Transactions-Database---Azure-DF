@@ -2,18 +2,18 @@
 	"name": "File_import",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AzureFileStorage1",
+			"referenceName": "AzureBlobStorage1",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
 		"type": "Excel",
 		"typeProperties": {
-			"sheetName": "Movimientos",
 			"location": {
-				"type": "AzureFileStorageLocation",
-				"fileName": "export2022126 (2).xls"
+				"type": "AzureBlobStorageLocation",
+				"fileName": "export2022126 (2).xls",
+				"container": "blobcontainer"
 			},
-			"range": "A8:E80",
+			"range": "A8:E180",
 			"firstRowAsHeader": true
 		},
 		"schema": [
