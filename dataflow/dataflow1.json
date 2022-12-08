@@ -20,7 +20,11 @@
 					"name": "csvdatabasefile"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"name": "cachenewfilekey"
+				}
+			],
 			"transformations": [
 				{
 					"name": "AddKey"
@@ -42,6 +46,12 @@
 				},
 				{
 					"name": "derivedColumn2"
+				},
+				{
+					"name": "select1"
+				},
+				{
+					"name": "PrepForUnion"
 				}
 			],
 			"scriptLines": [
@@ -80,9 +90,32 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> RenameColumns",
-				"derivedColumn2, RenameColumns union(byName: true)~> union1",
+				"derivedColumn2, PrepForUnion union(byName: true)~> union1",
 				"AddKey derive(Source = 'newfile') ~> derivedColumn1",
-				"AddKey1 derive(Source = 'database') ~> derivedColumn2"
+				"AddKey1 derive(Source = 'database') ~> derivedColumn2",
+				"RenameColumns select(mapColumn(",
+				"          Key",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"RenameColumns select(mapColumn(",
+				"          DateOperation,",
+				"          DateEffective,",
+				"          Description,",
+				"          Amount,",
+				"          Saldo,",
+				"          Key,",
+				"          Source",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> PrepForUnion",
+				"select1 sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 1) ~> cachenewfilekey"
 			]
 		}
 	}
