@@ -43,7 +43,7 @@
 					"name": "union1"
 				},
 				{
-					"name": "select1"
+					"name": "RenameColumns"
 				},
 				{
 					"name": "split1"
@@ -76,7 +76,7 @@
 				"AddSource derive(Key = crc32(concat({FECHA OPERACIÓN},{FECHA VALOR},{IMPORTE EUR},{SALDO}))) ~> AddKey",
 				"AddKey filter(or(not(isNull({FECHA OPERACIÓN})),not(isNull({IMPORTE EUR})))) ~> FilterNulls",
 				"AddSource1 derive(Key = crc32(concat(DateOperation,DateEffective,Amount,Saldo))) ~> AddKey1",
-				"AddKey1, select1 union(byName: true)~> union1",
+				"AddKey1, RenameColumns union(byName: true)~> union1",
 				"FilterNulls select(mapColumn(",
 				"          DateOperation = {FECHA OPERACIÓN},",
 				"          DateEffective = {FECHA VALOR},",
@@ -87,7 +87,7 @@
 				"          Key",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1",
+				"     skipDuplicateMapOutputs: true) ~> RenameColumns",
 				"union1 split(ERROR_FUNCTION(''),",
 				"     disjoint: false) ~> split1@(, )"
 			]
