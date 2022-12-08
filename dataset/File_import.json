@@ -8,10 +8,9 @@
 		"annotations": [],
 		"type": "Excel",
 		"typeProperties": {
-			"sheetName": "Movimientos",
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "testexport.xls",
+				"fileName": "export2022126-nov15onw.xls",
 				"container": "blobcontainer"
 			},
 			"range": "A8:E180",
