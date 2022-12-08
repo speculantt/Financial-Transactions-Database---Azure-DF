@@ -227,7 +227,11 @@
 								"referenceName": "fulldatabasefile",
 								"type": "DatasetReference"
 							},
-							"name": "WriteDown"
+							"name": "WriteDown",
+							"rejectedDataLinkedService": {
+								"referenceName": "AzureBlobStorage1",
+								"type": "LinkedServiceReference"
+							}
 						}
 					],
 					"transformations": [
@@ -336,13 +340,23 @@
 						"          Saldo as string",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> WriteDown"
+						"     skipDuplicateMapOutputs: true,",
+						"     outputAssertFailedRows: true,",
+						"     assertFailure_container: 'blobcontainer',",
+						"     mapColumn(",
+						"          DateOperation,",
+						"          DateEffective,",
+						"          Description,",
+						"          Amount,",
+						"          Saldo",
+						"     )) ~> WriteDown"
 					]
 				}
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/File_import')]",
-				"[concat(variables('factoryId'), '/datasets/fulldatabasefile')]"
+				"[concat(variables('factoryId'), '/datasets/fulldatabasefile')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
 			]
 		},
 		{
