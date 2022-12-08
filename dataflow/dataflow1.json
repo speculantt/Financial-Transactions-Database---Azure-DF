@@ -30,6 +30,9 @@
 				{
 					"name": "Source1",
 					"description": "Adding source column"
+				},
+				{
+					"name": "derivedColumn1"
 				}
 			],
 			"scriptLines": [
@@ -43,7 +46,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
-				"     moveFiles: ['','']) ~> NewFile",
+				"     moveFiles: ['','Processed']) ~> NewFile",
 				"source(output(",
 				"          DateOperation as string,",
 				"          DateEffective as string,",
@@ -55,7 +58,8 @@
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> FullDatabaseFile",
 				"FullDatabaseFile derive(Source = 'existing') ~> Source",
-				"NewFile derive(Source = 'NewFile') ~> Source1"
+				"NewFile derive(Source = 'NewFile') ~> Source1",
+				"Source1 derive() ~> derivedColumn1"
 			]
 		}
 	}
