@@ -8,12 +8,12 @@
 		"annotations": [],
 		"type": "Excel",
 		"typeProperties": {
+			"sheetName": "Movimientos",
 			"location": {
 				"type": "AzureBlobStorageLocation",
 				"fileName": "testexport.xls",
 				"container": "blobcontainer"
 			},
-			"sheetIndex": 1,
 			"range": "A8:E180",
 			"firstRowAsHeader": true
 		},
