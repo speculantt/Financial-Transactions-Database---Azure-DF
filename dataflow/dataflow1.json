@@ -22,9 +22,6 @@
 			],
 			"sinks": [
 				{
-					"name": "cachenewfilekey"
-				},
-				{
 					"dataset": {
 						"referenceName": "fulldatabasefile",
 						"type": "DatasetReference"
@@ -128,17 +125,6 @@
 				"     broadcast: 'auto')~> lookup1",
 				"lookup1 alterRow(updateIf(and(Key==NewFileKey, Source=='database')),",
 				"     insertIf(Source=='newfile')) ~> alterRow1",
-				"select1 sink(validateSchema: false,",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     keys:['Key'],",
-				"     store: 'cache',",
-				"     format: 'inline',",
-				"     output: false,",
-				"     saveOrder: 1,",
-				"     mapColumn(",
-				"          Key = NewFileKey",
-				"     )) ~> cachenewfilekey",
 				"alterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
