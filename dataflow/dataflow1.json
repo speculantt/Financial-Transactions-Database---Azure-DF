@@ -56,6 +56,9 @@
 				},
 				{
 					"name": "select1"
+				},
+				{
+					"name": "select2"
 				}
 			],
 			"scriptLines": [
@@ -83,7 +86,7 @@
 				"NewFile derive(Key = crc32(concat({FECHA OPERACIÓN},{FECHA VALOR},{IMPORTE EUR},{SALDO}))) ~> AddKey",
 				"AddKey filter(or(not(isNull({FECHA OPERACIÓN})),not(isNull({IMPORTE EUR})))) ~> FilterNulls",
 				"csvdatabasefile derive(Key = crc32(concat(DateOperation,DateEffective,Amount,Saldo))) ~> AddKey1",
-				"RenameColumns, mapkeycolumn union(byName: true)~> union1",
+				"RenameColumns, select2 union(byName: true)~> union1",
 				"FilterNulls select(mapColumn(",
 				"          DateOperation = {FECHA OPERACIÓN},",
 				"          DateEffective = {FECHA VALOR},",
@@ -101,6 +104,17 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
+				"mapkeycolumn select(mapColumn(",
+				"          DateOperation,",
+				"          DateEffective,",
+				"          Description,",
+				"          Amount,",
+				"          Saldo,",
+				"          Key,",
+				"          mapkey",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select2",
 				"alterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
