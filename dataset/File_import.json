@@ -10,8 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "export2022126-nov15onw.xls",
-				"container": "blobcontainer"
+				"fileName": "*.csv",
+				"container": "inputdata"
 			},
 			"range": "A8:E180",
 			"firstRowAsHeader": true
