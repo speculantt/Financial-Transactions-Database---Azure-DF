@@ -53,6 +53,9 @@
 				},
 				{
 					"name": "derivedColumn1"
+				},
+				{
+					"name": "select1"
 				}
 			],
 			"scriptLines": [
@@ -93,6 +96,11 @@
 				"     skipDuplicateMapOutputs: true) ~> RenameColumns",
 				"union1 alterRow(upsertIf(true())) ~> alterRow1",
 				"AddKey1 derive(mapkey = newfilecache#lookup(Key)) ~> derivedColumn1",
+				"RenameColumns select(mapColumn(",
+				"          Key",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
 				"alterRow1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -104,7 +112,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> sink1",
-				"RenameColumns sink(validateSchema: false,",
+				"select1 sink(validateSchema: false,",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
 				"     keys:['Key'],",
