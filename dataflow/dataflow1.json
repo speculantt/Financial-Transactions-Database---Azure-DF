@@ -13,10 +13,6 @@
 					"description": "financial import from santander"
 				},
 				{
-					"name": "FullDatabaseFile",
-					"description": "financial import from santander"
-				},
-				{
 					"dataset": {
 						"referenceName": "fulldatabasefile",
 						"type": "DatasetReference"
@@ -51,8 +47,6 @@
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
 				"     moveFiles: ['NewFilesUpload','Processed']) ~> NewFile",
-				"source(allowSchemaDrift: true,",
-				"     validateSchema: false) ~> FullDatabaseFile",
 				"source(output(",
 				"          DateOperation as string,",
 				"          DateEffective as string,",
@@ -63,7 +57,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> csvdatabasefile",
-				"FullDatabaseFile derive(Source = 'existing') ~> Source",
+				"csvdatabasefile derive(Source = 'existing') ~> Source",
 				"NewFile derive(Source = 'NewFile') ~> Source1",
 				"Source sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
