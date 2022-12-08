@@ -46,22 +46,22 @@
 					"name": "union1"
 				},
 				{
-					"name": "derivedColumn1"
+					"name": "AddSource"
 				},
 				{
-					"name": "derivedColumn2"
+					"name": "AddSource1"
 				},
 				{
-					"name": "select1"
+					"name": "SelectKeyOnly"
 				},
 				{
 					"name": "PrepForUnion"
 				},
 				{
-					"name": "lookup1"
+					"name": "LookupKey"
 				},
 				{
-					"name": "alterRow1"
+					"name": "UpdateInsert"
 				}
 			],
 			"scriptLines": [
@@ -87,7 +87,7 @@
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> csvdatabasefile",
 				"NewFile derive(Key = crc32(concat({FECHA OPERACIÓN},{FECHA VALOR},{IMPORTE EUR},{SALDO}))) ~> AddKey",
-				"derivedColumn1 filter(or(not(isNull({FECHA OPERACIÓN})),not(isNull({IMPORTE EUR})))) ~> FilterNulls",
+				"AddSource filter(or(not(isNull({FECHA OPERACIÓN})),not(isNull({IMPORTE EUR})))) ~> FilterNulls",
 				"csvdatabasefile derive(Key = crc32(concat(DateOperation,DateEffective,Amount,Saldo))) ~> AddKey1",
 				"FilterNulls select(mapColumn(",
 				"          DateOperation = {FECHA OPERACIÓN},",
@@ -100,14 +100,14 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> RenameColumns",
-				"derivedColumn2, PrepForUnion union(byName: true)~> union1",
-				"AddKey derive(Source = 'newfile') ~> derivedColumn1",
-				"AddKey1 derive(Source = 'database') ~> derivedColumn2",
+				"AddSource1, PrepForUnion union(byName: true)~> union1",
+				"AddKey derive(Source = 'newfile') ~> AddSource",
+				"AddKey1 derive(Source = 'database') ~> AddSource1",
 				"RenameColumns select(mapColumn(",
 				"          NewFileKey = Key",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1",
+				"     skipDuplicateMapOutputs: true) ~> SelectKeyOnly",
 				"RenameColumns select(mapColumn(",
 				"          DateOperation,",
 				"          DateEffective,",
@@ -119,13 +119,13 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> PrepForUnion",
-				"union1, select1 lookup(Key == NewFileKey,",
+				"union1, SelectKeyOnly lookup(Key == NewFileKey,",
 				"     multiple: false,",
 				"     pickup: 'any',",
-				"     broadcast: 'auto')~> lookup1",
-				"lookup1 alterRow(updateIf(and(Key==NewFileKey, Source=='database')),",
-				"     insertIf(Source=='newfile')) ~> alterRow1",
-				"alterRow1 sink(allowSchemaDrift: true,",
+				"     broadcast: 'auto')~> LookupKey",
+				"LookupKey alterRow(updateIf(and(Key==NewFileKey, Source=='database')),",
+				"     insertIf(Source=='newfile')) ~> UpdateInsert",
+				"UpdateInsert sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          DateOperation as string,",
