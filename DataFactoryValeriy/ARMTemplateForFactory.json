@@ -47,7 +47,7 @@
 					"sheetName": "Movimientos",
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"fileName": "*.csv",
+						"fileName": "export.xls",
 						"folderPath": "NewFiles",
 						"container": "blobcontainer"
 					},
