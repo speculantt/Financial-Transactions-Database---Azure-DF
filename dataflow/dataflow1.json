@@ -46,7 +46,7 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
-				"     moveFiles: ['','Processed']) ~> NewFile",
+				"     moveFiles: ['NewFilesUpload','Processed']) ~> NewFile",
 				"source(output(",
 				"          DateOperation as string,",
 				"          DateEffective as string,",
