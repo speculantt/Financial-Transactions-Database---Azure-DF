@@ -11,7 +11,8 @@
 			"location": {
 				"type": "AzureBlobStorageLocation",
 				"fileName": "*.csv",
-				"container": "inputdata"
+				"folderPath": "NewFiles",
+				"container": "blobcontainer"
 			},
 			"range": "A8:E180",
 			"firstRowAsHeader": true
