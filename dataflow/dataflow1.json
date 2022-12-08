@@ -20,16 +20,16 @@
 					"name": "csvdatabasefile"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "fulldatabasefile",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
-				{
-					"name": "AddSource1",
-					"description": "Adding source column"
-				},
-				{
-					"name": "AddSource",
-					"description": "Adding source column"
-				},
 				{
 					"name": "AddKey"
 				},
@@ -71,11 +71,9 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> csvdatabasefile",
-				"csvdatabasefile derive(Source = 'existing') ~> AddSource1",
-				"NewFile derive(Source = 'NewFile') ~> AddSource",
-				"AddSource derive(Key = crc32(concat({FECHA OPERACIÓN},{FECHA VALOR},{IMPORTE EUR},{SALDO}))) ~> AddKey",
+				"NewFile derive(Key = crc32(concat({FECHA OPERACIÓN},{FECHA VALOR},{IMPORTE EUR},{SALDO}))) ~> AddKey",
 				"AddKey filter(or(not(isNull({FECHA OPERACIÓN})),not(isNull({IMPORTE EUR})))) ~> FilterNulls",
-				"AddSource1 derive(Key = crc32(concat(DateOperation,DateEffective,Amount,Saldo))) ~> AddKey1",
+				"csvdatabasefile derive(Key = crc32(concat(DateOperation,DateEffective,Amount,Saldo))) ~> AddKey1",
 				"AddKey1, RenameColumns union(byName: true)~> union1",
 				"FilterNulls select(mapColumn(",
 				"          DateOperation = {FECHA OPERACIÓN},",
@@ -83,12 +81,22 @@
 				"          Description = CONCEPTO,",
 				"          Amount = {IMPORTE EUR},",
 				"          Saldo = SALDO,",
-				"          Source,",
 				"          Key",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> RenameColumns",
-				"union1 alterRow(upsertIf(true())) ~> alterRow1"
+				"union1 alterRow(upsertIf(true())) ~> alterRow1",
+				"alterRow1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          DateOperation as string,",
+				"          DateEffective as string,",
+				"          Description as string,",
+				"          Amount as string,",
+				"          Saldo as string",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
