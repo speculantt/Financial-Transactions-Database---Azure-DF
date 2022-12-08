@@ -40,6 +40,12 @@
 				},
 				{
 					"name": "derivedColumn1"
+				},
+				{
+					"name": "cast1"
+				},
+				{
+					"name": "select1"
 				}
 			],
 			"scriptLines": [
@@ -65,8 +71,25 @@
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> csvdatabasefile",
 				"csvdatabasefile derive(Source = 'existing') ~> Source",
-				"NewFile derive(Source = 'NewFile') ~> Source1",
-				"Source1 derive(Key = crc32(concat({FECHA OPERACIÓN},{FECHA VALOR},{IMPORTE EUR},SALDO))) ~> derivedColumn1",
+				"select1 derive(Source = 'NewFile') ~> Source1",
+				"Source1 derive(Key = crc32(concat(DateOperation,DateEffective,Amount,Saldo))) ~> derivedColumn1",
+				"NewFile cast(output(",
+				"          {FECHA OPERACIÓN} as date 'yyyy-MM-dd',",
+				"          {FECHA VALOR} as date 'yyyy-MM-dd',",
+				"          CONCEPTO as string,",
+				"          {IMPORTE EUR} as double,",
+				"          SALDO as double",
+				"     ),",
+				"     errors: true) ~> cast1",
+				"cast1 select(mapColumn(",
+				"          DateOperation = {FECHA OPERACIÓN},",
+				"          DateEffective = {FECHA VALOR},",
+				"          Description = CONCEPTO,",
+				"          Amount = {IMPORTE EUR},",
+				"          Saldo = SALDO",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
 				"Source sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
