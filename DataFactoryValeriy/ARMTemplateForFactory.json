@@ -339,6 +339,7 @@
 						"          Amount as string,",
 						"          Saldo as string",
 						"     ),",
+						"     partitionFileNames:['fulldatabasefile.csv'],",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
 						"     outputAssertFailedRows: true,",
@@ -349,7 +350,8 @@
 						"          Description,",
 						"          Amount,",
 						"          Saldo",
-						"     )) ~> WriteDown"
+						"     ),",
+						"     partitionBy('hash', 1)) ~> WriteDown"
 					]
 				}
 			},
