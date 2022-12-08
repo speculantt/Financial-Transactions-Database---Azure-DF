@@ -37,6 +37,9 @@
 				{
 					"name": "Source1",
 					"description": "Adding source column"
+				},
+				{
+					"name": "derivedColumn1"
 				}
 			],
 			"scriptLines": [
@@ -63,6 +66,7 @@
 				"     ignoreNoFilesFound: false) ~> csvdatabasefile",
 				"csvdatabasefile derive(Source = 'existing') ~> Source",
 				"NewFile derive(Source = 'NewFile') ~> Source1",
+				"Source1 derive(Key = crc32(concat({FECHA OPERACIÓN},{FECHA VALOR},{IMPORTE EUR},SALDO))) ~> derivedColumn1",
 				"Source sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
