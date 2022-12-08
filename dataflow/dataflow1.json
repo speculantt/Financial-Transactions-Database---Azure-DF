@@ -13,15 +13,22 @@
 					"description": "financial import from santander"
 				},
 				{
-					"dataset": {
-						"referenceName": "FullDatabaseFile",
-						"type": "DatasetReference"
-					},
 					"name": "FullDatabaseFile",
 					"description": "financial import from santander"
+				},
+				{
+					"dataset": {
+						"referenceName": "fulldatabasefile",
+						"type": "DatasetReference"
+					},
+					"name": "csvdatabasefile"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "Source",
@@ -30,9 +37,6 @@
 				{
 					"name": "Source1",
 					"description": "Adding source column"
-				},
-				{
-					"name": "derivedColumn1"
 				}
 			],
 			"scriptLines": [
@@ -47,6 +51,8 @@
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false,",
 				"     moveFiles: ['NewFilesUpload','Processed']) ~> NewFile",
+				"source(allowSchemaDrift: true,",
+				"     validateSchema: false) ~> FullDatabaseFile",
 				"source(output(",
 				"          DateOperation as string,",
 				"          DateEffective as string,",
@@ -56,10 +62,13 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> FullDatabaseFile",
+				"     ignoreNoFilesFound: false) ~> csvdatabasefile",
 				"FullDatabaseFile derive(Source = 'existing') ~> Source",
 				"NewFile derive(Source = 'NewFile') ~> Source1",
-				"Source1 derive() ~> derivedColumn1"
+				"Source sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
