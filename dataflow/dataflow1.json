@@ -52,7 +52,7 @@
 					"name": "alterRow1"
 				},
 				{
-					"name": "derivedColumn1"
+					"name": "mapkeycolumn"
 				},
 				{
 					"name": "select1"
@@ -83,7 +83,7 @@
 				"NewFile derive(Key = crc32(concat({FECHA OPERACIÓN},{FECHA VALOR},{IMPORTE EUR},{SALDO}))) ~> AddKey",
 				"AddKey filter(or(not(isNull({FECHA OPERACIÓN})),not(isNull({IMPORTE EUR})))) ~> FilterNulls",
 				"csvdatabasefile derive(Key = crc32(concat(DateOperation,DateEffective,Amount,Saldo))) ~> AddKey1",
-				"derivedColumn1, RenameColumns union(byName: true)~> union1",
+				"RenameColumns, mapkeycolumn union(byName: true)~> union1",
 				"FilterNulls select(mapColumn(",
 				"          DateOperation = {FECHA OPERACIÓN},",
 				"          DateEffective = {FECHA VALOR},",
@@ -95,7 +95,7 @@
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> RenameColumns",
 				"union1 alterRow(upsertIf(true())) ~> alterRow1",
-				"AddKey1 derive(mapkey = newfilecache#lookup(Key)) ~> derivedColumn1",
+				"AddKey1 derive(mapkey = newfilecache#lookup(Key)) ~> mapkeycolumn",
 				"RenameColumns select(mapColumn(",
 				"          Key",
 				"     ),",
