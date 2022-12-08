@@ -119,8 +119,11 @@
 				"     keys:['Key'],",
 				"     store: 'cache',",
 				"     format: 'inline',",
-				"     output: true,",
-				"     saveOrder: 1) ~> cachenewfilekey"
+				"     output: false,",
+				"     saveOrder: 1,",
+				"     mapColumn(",
+				"          Key",
+				"     )) ~> cachenewfilekey"
 			]
 		}
 	}
