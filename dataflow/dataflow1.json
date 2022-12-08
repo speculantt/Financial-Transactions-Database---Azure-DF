@@ -20,11 +20,7 @@
 					"name": "csvdatabasefile"
 				}
 			],
-			"sinks": [
-				{
-					"name": "newfilecache"
-				}
-			],
+			"sinks": [],
 			"transformations": [
 				{
 					"name": "AddKey"
@@ -40,12 +36,6 @@
 				},
 				{
 					"name": "mapkeycolumn"
-				},
-				{
-					"name": "select1"
-				},
-				{
-					"name": "cast1"
 				}
 			],
 			"scriptLines": [
@@ -83,24 +73,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> RenameColumns",
-				"AddKey1 derive(mapkey = newfilecache#lookup(Key)) ~> mapkeycolumn",
-				"RenameColumns select(mapColumn(",
-				"          Key",
-				"     ),",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1",
-				"mapkeycolumn cast(output(",
-				"          mapkey as long",
-				"     ),",
-				"     errors: true) ~> cast1",
-				"select1 sink(validateSchema: false,",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     keys:['Key'],",
-				"     store: 'cache',",
-				"     format: 'inline',",
-				"     output: false,",
-				"     saveOrder: 0) ~> newfilecache"
+				"AddKey1 derive(mapkey = iif(isNull(newfilecache#lookup(Key)), 'keep', 'upd')) ~> mapkeycolumn"
 			]
 		}
 	}
