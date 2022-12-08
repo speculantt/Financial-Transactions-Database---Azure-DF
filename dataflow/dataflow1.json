@@ -25,6 +25,10 @@
 			"transformations": [
 				{
 					"name": "Source"
+				},
+				{
+					"name": "Source1",
+					"description": "Adding source column"
 				}
 			],
 			"scriptLines": [
@@ -49,7 +53,8 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> FullDatabaseFile",
-				"FullDatabaseFile derive(Source = 'existing') ~> Source"
+				"FullDatabaseFile derive(Source = 'existing') ~> Source",
+				"NewFile derive(Source = 'NewFile') ~> Source1"
 			]
 		}
 	}
