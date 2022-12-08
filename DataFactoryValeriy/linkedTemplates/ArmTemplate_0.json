@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "DataFactoryValeriy"
 		},
+		"AzureBlobStorage1_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage1'"
+		},
 		"AzureFileStorage1_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureFileStorage1'"
@@ -14,12 +18,33 @@
 		"AzureTableStorage1_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'AzureTableStorage1'"
+		},
+		"AzureTableStorageReal_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureTableStorageReal'"
+		},
+		"FullFileDatabase_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'FullFileDatabase'"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage1_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/AzureFileStorage1')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -48,12 +73,38 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureTableStorageReal')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureTableStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureTableStorageReal_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FullFileDatabase')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('FullFileDatabase_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/File_import')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "AzureFileStorage1",
+					"referenceName": "AzureBlobStorage1",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
@@ -61,10 +112,12 @@
 				"typeProperties": {
 					"sheetName": "Movimientos",
 					"location": {
-						"type": "AzureFileStorageLocation",
-						"fileName": "export2022126 (2).xls"
+						"type": "AzureBlobStorageLocation",
+						"fileName": "*.csv",
+						"folderPath": "NewFiles",
+						"container": "blobcontainer"
 					},
-					"range": "A8:E80",
+					"range": "A8:E180",
 					"firstRowAsHeader": true
 				},
 				"schema": [
@@ -91,31 +144,61 @@
 				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureFileStorage1')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Financials_table')]",
+			"name": "[concat(parameters('factoryName'), '/fulldatabasefile')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "AzureTableStorage1",
+					"referenceName": "AzureBlobStorage1",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
-				"type": "AzureTable",
-				"schema": [],
+				"type": "DelimitedText",
 				"typeProperties": {
-					"tableName": "Financialstotal"
-				}
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "fulldatabasefile.csv",
+						"folderPath": "DatabaseFile",
+						"container": "blobcontainer"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "DateOperation",
+						"type": "String"
+					},
+					{
+						"name": "DateEffective",
+						"type": "String"
+					},
+					{
+						"name": "Description",
+						"type": "String"
+					},
+					{
+						"name": "Amount",
+						"type": "String"
+					},
+					{
+						"name": "Saldo",
+						"type": "String"
+					}
+				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureTableStorage1')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage1')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
+			"name": "[concat(parameters('factoryName'), '/UpdateData')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -127,16 +210,61 @@
 								"referenceName": "File_import",
 								"type": "DatasetReference"
 							},
-							"name": "import1",
+							"name": "NewFile",
 							"description": "financial import from santander"
 						},
 						{
-							"name": "import2",
-							"description": "financial table containing data"
+							"dataset": {
+								"referenceName": "fulldatabasefile",
+								"type": "DatasetReference"
+							},
+							"name": "csvdatabasefile"
 						}
 					],
-					"sinks": [],
-					"transformations": [],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "fulldatabasefile",
+								"type": "DatasetReference"
+							},
+							"name": "WriteDown"
+						}
+					],
+					"transformations": [
+						{
+							"name": "AddKey"
+						},
+						{
+							"name": "FilterNulls"
+						},
+						{
+							"name": "AddKey1"
+						},
+						{
+							"name": "RenameColumns"
+						},
+						{
+							"name": "union1"
+						},
+						{
+							"name": "AddSource"
+						},
+						{
+							"name": "AddSource1"
+						},
+						{
+							"name": "SelectKeyOnly"
+						},
+						{
+							"name": "PrepForUnion"
+						},
+						{
+							"name": "LookupKey"
+						},
+						{
+							"name": "UpdateInsert"
+						}
+					],
 					"scriptLines": [
 						"source(output(",
 						"          {FECHA OPERACIÓN} as string,",
@@ -148,14 +276,121 @@
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     ignoreNoFilesFound: false,",
-						"     moveFiles: ['','']) ~> import1",
-						"source(allowSchemaDrift: true,",
-						"     validateSchema: false) ~> "
+						"     moveFiles: ['inputdata','ProcessedFiles']) ~> NewFile",
+						"source(output(",
+						"          DateOperation as string,",
+						"          DateEffective as string,",
+						"          Description as string,",
+						"          Amount as string,",
+						"          Saldo as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> csvdatabasefile",
+						"NewFile derive(Key = crc32(concat({FECHA OPERACIÓN},{FECHA VALOR},{IMPORTE EUR},{SALDO}))) ~> AddKey",
+						"AddSource filter(or(not(isNull({FECHA OPERACIÓN})),not(isNull({IMPORTE EUR})))) ~> FilterNulls",
+						"csvdatabasefile derive(Key = crc32(concat(DateOperation,DateEffective,Amount,Saldo))) ~> AddKey1",
+						"FilterNulls select(mapColumn(",
+						"          DateOperation = {FECHA OPERACIÓN},",
+						"          DateEffective = {FECHA VALOR},",
+						"          Description = CONCEPTO,",
+						"          Amount = {IMPORTE EUR},",
+						"          Saldo = SALDO,",
+						"          Key,",
+						"          Source",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> RenameColumns",
+						"AddSource1, PrepForUnion union(byName: true)~> union1",
+						"AddKey derive(Source = 'newfile') ~> AddSource",
+						"AddKey1 derive(Source = 'database') ~> AddSource1",
+						"RenameColumns select(mapColumn(",
+						"          NewFileKey = Key",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectKeyOnly",
+						"RenameColumns select(mapColumn(",
+						"          DateOperation,",
+						"          DateEffective,",
+						"          Description,",
+						"          Amount,",
+						"          Saldo,",
+						"          Key,",
+						"          Source",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> PrepForUnion",
+						"union1, SelectKeyOnly lookup(Key == NewFileKey,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> LookupKey",
+						"LookupKey alterRow(updateIf(and(Key==NewFileKey,Source=='database')),",
+						"     insertIf(Source=='newfile')) ~> UpdateInsert",
+						"UpdateInsert sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          DateOperation as string,",
+						"          DateEffective as string,",
+						"          Description as string,",
+						"          Amount as string,",
+						"          Saldo as string",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> WriteDown"
 					]
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/File_import')]"
+				"[concat(variables('factoryId'), '/datasets/File_import')]",
+				"[concat(variables('factoryId'), '/datasets/fulldatabasefile')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DataUploadtoAzure",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "UpdateData",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"NewFile": {},
+									"csvdatabasefile": {},
+									"WriteDown": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/UpdateData')]"
 			]
 		}
 	]

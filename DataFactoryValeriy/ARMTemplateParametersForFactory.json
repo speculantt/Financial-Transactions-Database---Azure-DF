@@ -5,10 +5,19 @@
 		"factoryName": {
 			"value": "DataFactoryValeriy"
 		},
+		"AzureBlobStorage1_connectionString": {
+			"value": ""
+		},
 		"AzureFileStorage1_connectionString": {
 			"value": ""
 		},
 		"AzureTableStorage1_connectionString": {
+			"value": ""
+		},
+		"AzureTableStorageReal_connectionString": {
+			"value": ""
+		},
+		"FullFileDatabase_connectionString": {
 			"value": ""
 		}
 	}
