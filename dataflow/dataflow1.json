@@ -24,7 +24,8 @@
 			"sinks": [],
 			"transformations": [
 				{
-					"name": "Source"
+					"name": "Source",
+					"description": "Adding source column"
 				},
 				{
 					"name": "Source1",
