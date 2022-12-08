@@ -52,6 +52,9 @@
 				},
 				{
 					"name": "PrepForUnion"
+				},
+				{
+					"name": "derivedColumn3"
 				}
 			],
 			"scriptLines": [
@@ -109,9 +112,11 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> PrepForUnion",
+				"union1 derive(Action = cachenewfilekey#lookup(Key)) ~> derivedColumn3",
 				"select1 sink(validateSchema: false,",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
+				"     keys:['Key'],",
 				"     store: 'cache',",
 				"     format: 'inline',",
 				"     output: false,",
