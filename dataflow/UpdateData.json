@@ -62,10 +62,10 @@
 					"name": "PrepForUnion"
 				},
 				{
-					"name": "LookupKey"
+					"name": "UpdateInsert"
 				},
 				{
-					"name": "UpdateInsert"
+					"name": "join1"
 				}
 			],
 			"scriptLines": [
@@ -123,12 +123,13 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> PrepForUnion",
-				"union1, SelectKeyOnly lookup(Key == NewFileKey,",
-				"     multiple: false,",
-				"     pickup: 'any',",
-				"     broadcast: 'auto')~> LookupKey",
-				"LookupKey alterRow(updateIf(and(Key==NewFileKey,Source=='database')),",
+				"join1 alterRow(updateIf(and(Key==NewFileKey,Source=='database')),",
 				"     insertIf(and(Key!=NewFileKey,Source=='newfile'))) ~> UpdateInsert",
+				"union1, SelectKeyOnly join(Key == NewFileKey,",
+				"     joinType:'left',",
+				"     matchType:'exact',",
+				"     ignoreSpaces: false,",
+				"     broadcast: 'auto')~> join1",
 				"UpdateInsert sink(allowSchemaDrift: false,",
 				"     validateSchema: false,",
 				"     input(",
