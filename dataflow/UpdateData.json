@@ -27,6 +27,9 @@
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
+				},
+				{
+					"name": "ExistingKeysSetCache"
 				}
 			],
 			"transformations": [
@@ -165,7 +168,15 @@
 				"          Amount,",
 				"          Saldo",
 				"     ),",
-				"     partitionBy('hash', 1)) ~> sink1"
+				"     partitionBy('hash', 1)) ~> sink1",
+				"filter1 sink(validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     keys:['ExistingKey'],",
+				"     store: 'cache',",
+				"     format: 'inline',",
+				"     output: false,",
+				"     saveOrder: 1) ~> ExistingKeysSetCache"
 			]
 		}
 	}
