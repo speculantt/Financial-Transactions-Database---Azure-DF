@@ -58,9 +58,6 @@
 					"name": "union1"
 				},
 				{
-					"name": "select1"
-				},
-				{
 					"name": "ConditionalSplit"
 				},
 				{
@@ -71,6 +68,12 @@
 				},
 				{
 					"name": "MapNewRecords"
+				},
+				{
+					"name": "union2"
+				},
+				{
+					"name": "select1"
 				}
 			],
 			"scriptLines": [
@@ -122,18 +125,6 @@
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> LookupExisting",
 				"AddSource1, LookupExisting union(byName: true)~> union1",
-				"ConditionalSplit@NewRecords select(mapColumn(",
-				"          DateOperation,",
-				"          DateEffective,",
-				"          Description,",
-				"          Amount,",
-				"          Saldo,",
-				"          Key,",
-				"          Source,",
-				"          ExistingKey",
-				"     ),",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1",
 				"MapNewRecords split(and(Source==\"newfile\",isNull(ExistingKey)),",
 				"     and(Source==\"newfile\",ExistingKey==Key),",
 				"     and(Source==\"database\",isNull(ExistingKey)),",
@@ -149,7 +140,17 @@
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> MapNewRecords",
-				"select1 sink(allowSchemaDrift: true,",
+				"ConditionalSplit@NewRecords, ConditionalSplit@UpdateRecords, ConditionalSplit@UnchangedRecords union(byName: true)~> union2",
+				"union2 select(mapColumn(",
+				"          DateOperation,",
+				"          DateEffective,",
+				"          Description,",
+				"          Amount,",
+				"          Saldo",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: false,",
 				"     validateSchema: false,",
 				"     input(",
 				"          DateOperation as string,",
@@ -161,13 +162,6 @@
 				"     partitionFileNames:['fulldatabasefile.csv'],",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     mapColumn(",
-				"          DateOperation,",
-				"          DateEffective,",
-				"          Description,",
-				"          Amount,",
-				"          Saldo",
-				"     ),",
 				"     partitionBy('hash', 1)) ~> sink1"
 			]
 		}
