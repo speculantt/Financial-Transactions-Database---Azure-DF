@@ -38,9 +38,6 @@
 					"name": "AddKey"
 				},
 				{
-					"name": "FilterNulls"
-				},
-				{
 					"name": "AddKey1"
 				},
 				{
@@ -66,6 +63,9 @@
 				},
 				{
 					"name": "union1"
+				},
+				{
+					"name": "FilterNulls"
 				}
 			],
 			"scriptLines": [
@@ -91,10 +91,9 @@
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     ignoreNoFilesFound: false) ~> csvdatabasefile",
-				"NewFile derive(Key = crc32(concat({FECHA OPERACIÓN},{FECHA VALOR},{IMPORTE EUR},{SALDO}))) ~> AddKey",
-				"AddSource filter(or(not(isNull({FECHA OPERACIÓN})),not(isNull({IMPORTE EUR})))) ~> FilterNulls",
+				"FilterNulls derive(Key = crc32(concat({FECHA OPERACIÓN},{FECHA VALOR},{IMPORTE EUR},{SALDO}))) ~> AddKey",
 				"csvdatabasefile derive(Key = crc32(concat(DateOperation,DateEffective,Amount,Saldo))) ~> AddKey1",
-				"FilterNulls select(mapColumn(",
+				"AddSource select(mapColumn(",
 				"          DateOperation = {FECHA OPERACIÓN},",
 				"          DateEffective = {FECHA VALOR},",
 				"          Description = CONCEPTO,",
@@ -132,6 +131,7 @@
 				"     broadcast: 'auto')~> join1",
 				"AddSource1, PrepForUnion union(byName: true,",
 				"     partitionBy('hash', 1))~> union1",
+				"NewFile filter(or(not(isNull({FECHA OPERACIÓN})),not(isNull({IMPORTE EUR})))) ~> FilterNulls",
 				"UpdateInsert sink(allowSchemaDrift: false,",
 				"     validateSchema: false,",
 				"     input(",
