@@ -48,6 +48,9 @@
 				},
 				{
 					"name": "union1"
+				},
+				{
+					"name": "select1"
 				}
 			],
 			"scriptLines": [
@@ -98,7 +101,19 @@
 				"     multiple: false,",
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> LookupExisting",
-				"AddSource1, LookupExisting union(byName: true)~> union1"
+				"AddSource1, LookupExisting union(byName: true)~> union1",
+				"union1 select(mapColumn(",
+				"          DateOperation,",
+				"          DateEffective,",
+				"          Description,",
+				"          Amount,",
+				"          Saldo,",
+				"          Key,",
+				"          Source,",
+				"          ExistingKey",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> select1"
 			]
 		}
 	}
