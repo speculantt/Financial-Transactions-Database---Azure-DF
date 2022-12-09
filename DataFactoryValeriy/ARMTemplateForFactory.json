@@ -239,9 +239,6 @@
 							"name": "AddKey"
 						},
 						{
-							"name": "FilterNulls"
-						},
-						{
 							"name": "AddKey1"
 						},
 						{
@@ -254,19 +251,16 @@
 							"name": "AddSource1"
 						},
 						{
-							"name": "SelectKeyOnly"
-						},
-						{
-							"name": "PrepForUnion"
-						},
-						{
 							"name": "UpdateInsert"
 						},
 						{
-							"name": "join1"
+							"name": "FilterNulls"
 						},
 						{
-							"name": "union1"
+							"name": "ExistingSetKeys"
+						},
+						{
+							"name": "lookup1"
 						}
 					],
 					"scriptLines": [
@@ -292,10 +286,9 @@
 						"     allowSchemaDrift: true,",
 						"     validateSchema: false,",
 						"     ignoreNoFilesFound: false) ~> csvdatabasefile",
-						"NewFile derive(Key = crc32(concat({FECHA OPERACIÓN},{FECHA VALOR},{IMPORTE EUR},{SALDO}))) ~> AddKey",
-						"AddSource filter(or(not(isNull({FECHA OPERACIÓN})),not(isNull({IMPORTE EUR})))) ~> FilterNulls",
+						"FilterNulls derive(Key = crc32(concat({FECHA OPERACIÓN},{FECHA VALOR},{IMPORTE EUR},{SALDO}))) ~> AddKey",
 						"csvdatabasefile derive(Key = crc32(concat(DateOperation,DateEffective,Amount,Saldo))) ~> AddKey1",
-						"FilterNulls select(mapColumn(",
+						"AddSource select(mapColumn(",
 						"          DateOperation = {FECHA OPERACIÓN},",
 						"          DateEffective = {FECHA VALOR},",
 						"          Description = CONCEPTO,",
@@ -308,31 +301,18 @@
 						"     skipDuplicateMapOutputs: true) ~> RenameColumns",
 						"AddKey derive(Source = 'newfile') ~> AddSource",
 						"AddKey1 derive(Source = 'database') ~> AddSource1",
-						"RenameColumns select(mapColumn(",
-						"          NewFileKey = Key",
+						"lookup1 alterRow(updateIf(not(isNull(ExistingKey))),",
+						"     insertIf(isNull(ExistingKey))) ~> UpdateInsert",
+						"NewFile filter(or(not(isNull({FECHA OPERACIÓN})),not(isNull({IMPORTE EUR})))) ~> FilterNulls",
+						"AddSource1 select(mapColumn(",
+						"          ExistingKey = Key",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> SelectKeyOnly",
-						"RenameColumns select(mapColumn(",
-						"          DateOperation,",
-						"          DateEffective,",
-						"          Description,",
-						"          Amount,",
-						"          Saldo,",
-						"          Key,",
-						"          Source",
-						"     ),",
-						"     skipDuplicateMapInputs: true,",
-						"     skipDuplicateMapOutputs: true) ~> PrepForUnion",
-						"join1 alterRow(updateIf(and(isNull(NewFileKey),Source=='database')),",
-						"     insertIf(and(Key!=NewFileKey,Source=='newfile'))) ~> UpdateInsert",
-						"union1, SelectKeyOnly join(Key == NewFileKey,",
-						"     joinType:'left',",
-						"     matchType:'exact',",
-						"     ignoreSpaces: false,",
-						"     broadcast: 'auto')~> join1",
-						"AddSource1, PrepForUnion union(byName: true,",
-						"     partitionBy('hash', 1))~> union1",
+						"     skipDuplicateMapOutputs: true) ~> ExistingSetKeys",
+						"RenameColumns, ExistingSetKeys lookup(Key == ExistingKey,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> lookup1",
 						"UpdateInsert sink(allowSchemaDrift: false,",
 						"     validateSchema: false,",
 						"     input(",
