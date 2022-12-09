@@ -51,7 +51,7 @@
 						"folderPath": "NewFiles",
 						"container": "blobcontainer"
 					},
-					"range": "A8:E180",
+					"range": "A8:E380",
 					"firstRowAsHeader": true
 				},
 				"schema": [
@@ -248,9 +248,6 @@
 							"name": "RenameColumns"
 						},
 						{
-							"name": "union1"
-						},
-						{
 							"name": "AddSource"
 						},
 						{
@@ -263,10 +260,13 @@
 							"name": "PrepForUnion"
 						},
 						{
-							"name": "LookupKey"
+							"name": "UpdateInsert"
 						},
 						{
-							"name": "UpdateInsert"
+							"name": "join1"
+						},
+						{
+							"name": "union1"
 						}
 					],
 					"scriptLines": [
@@ -277,8 +277,9 @@
 						"          {IMPORTE EUR} as string,",
 						"          SALDO as string",
 						"     ),",
-						"     allowSchemaDrift: true,",
+						"     allowSchemaDrift: false,",
 						"     validateSchema: false,",
+						"     limit: 200,",
 						"     ignoreNoFilesFound: false,",
 						"     moveFiles: ['inputdata','ProcessedFiles']) ~> NewFile",
 						"source(output(",
@@ -305,7 +306,6 @@
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> RenameColumns",
-						"AddSource1, PrepForUnion union(byName: true)~> union1",
 						"AddKey derive(Source = 'newfile') ~> AddSource",
 						"AddKey1 derive(Source = 'database') ~> AddSource1",
 						"RenameColumns select(mapColumn(",
@@ -324,12 +324,15 @@
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> PrepForUnion",
-						"union1, SelectKeyOnly lookup(Key == NewFileKey,",
-						"     multiple: false,",
-						"     pickup: 'any',",
-						"     broadcast: 'auto')~> LookupKey",
-						"LookupKey alterRow(updateIf(and(Key==NewFileKey,Source=='database')),",
-						"     insertIf(Source=='newfile')) ~> UpdateInsert",
+						"join1 alterRow(updateIf(and(isNull(NewFileKey),Source=='database')),",
+						"     insertIf(and(Key!=NewFileKey,Source=='newfile'))) ~> UpdateInsert",
+						"union1, SelectKeyOnly join(Key == NewFileKey,",
+						"     joinType:'left',",
+						"     matchType:'exact',",
+						"     ignoreSpaces: false,",
+						"     broadcast: 'auto')~> join1",
+						"AddSource1, PrepForUnion union(byName: true,",
+						"     partitionBy('hash', 1))~> union1",
 						"UpdateInsert sink(allowSchemaDrift: false,",
 						"     validateSchema: false,",
 						"     input(",
