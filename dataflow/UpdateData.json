@@ -128,7 +128,7 @@
 				"     pickup: 'any',",
 				"     broadcast: 'auto')~> LookupKey",
 				"LookupKey alterRow(updateIf(and(Key==NewFileKey,Source=='database')),",
-				"     insertIf(Source=='newfile')) ~> UpdateInsert",
+				"     insertIf(and(Key!=NewFileKey,Source=='newfile'))) ~> UpdateInsert",
 				"UpdateInsert sink(allowSchemaDrift: false,",
 				"     validateSchema: false,",
 				"     input(",
