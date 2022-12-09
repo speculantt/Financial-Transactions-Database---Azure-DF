@@ -128,7 +128,7 @@
 				"union1 split(and(Source==\"newfile\",isNull(ExistingKey)),",
 				"     and(Source==\"newfile\",ExistingKey==Key),",
 				"     and(Source==\"database\",isNull(ExistingKey)),",
-				"     disjoint: false) ~> ConditionalSplit@(NewRecords, UpdateRecords, UnchangedRecords, )",
+				"     disjoint: false) ~> ConditionalSplit@(NewRecords, UpdateRecords, UnchangedRecords, Others)",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
