@@ -62,6 +62,15 @@
 				},
 				{
 					"name": "ConditionalSplit"
+				},
+				{
+					"name": "alterRow1"
+				},
+				{
+					"name": "SelectExistingKeys"
+				},
+				{
+					"name": "filter1"
 				}
 			],
 			"scriptLines": [
@@ -128,7 +137,15 @@
 				"union1 split(and(Source==\"newfile\",isNull(ExistingKey)),",
 				"     and(Source==\"newfile\",ExistingKey==Key),",
 				"     and(Source==\"database\",isNull(ExistingKey)),",
-				"     disjoint: false) ~> ConditionalSplit@(NewRecords, UpdateRecords, UnchangedRecords, Others)",
+				"     and(Source==\"database\",lookup(expression)),",
+				"     disjoint: false) ~> ConditionalSplit@(NewRecords, UpdateRecords, UnchangedRecords, ToDeleteRecords, Others)",
+				"ConditionalSplit@UpdateRecords alterRow() ~> alterRow1",
+				"LookupExisting select(mapColumn(",
+				"          ExistingKey",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> SelectExistingKeys",
+				"SelectExistingKeys filter(not(isNull(ExistingKey))) ~> filter1",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
