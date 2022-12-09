@@ -20,7 +20,15 @@
 					"name": "csvdatabasefile"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "fulldatabasefile",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "AddKey"
@@ -113,7 +121,27 @@
 				"          ExistingKey",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1"
+				"     skipDuplicateMapOutputs: true) ~> select1",
+				"select1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          DateOperation as string,",
+				"          DateEffective as string,",
+				"          Description as string,",
+				"          Amount as string,",
+				"          Saldo as string",
+				"     ),",
+				"     partitionFileNames:['fulldatabasefile.csv'],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     mapColumn(",
+				"          DateOperation,",
+				"          DateEffective,",
+				"          Description,",
+				"          Amount,",
+				"          Saldo",
+				"     ),",
+				"     partitionBy('hash', 1)) ~> sink1"
 			]
 		}
 	}
