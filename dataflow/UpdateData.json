@@ -20,19 +20,7 @@
 					"name": "csvdatabasefile"
 				}
 			],
-			"sinks": [
-				{
-					"dataset": {
-						"referenceName": "fulldatabasefile",
-						"type": "DatasetReference"
-					},
-					"name": "WriteDown",
-					"rejectedDataLinkedService": {
-						"referenceName": "AzureBlobStorage1",
-						"type": "LinkedServiceReference"
-					}
-				}
-			],
+			"sinks": [],
 			"transformations": [
 				{
 					"name": "AddKey"
@@ -50,16 +38,16 @@
 					"name": "AddSource1"
 				},
 				{
-					"name": "UpdateInsert"
-				},
-				{
 					"name": "FilterNulls"
 				},
 				{
 					"name": "ExistingSetKeys"
 				},
 				{
-					"name": "lookup1"
+					"name": "LookupExisting"
+				},
+				{
+					"name": "union1"
 				}
 			],
 			"scriptLines": [
@@ -100,8 +88,6 @@
 				"     skipDuplicateMapOutputs: true) ~> RenameColumns",
 				"AddKey derive(Source = 'newfile') ~> AddSource",
 				"AddKey1 derive(Source = 'database') ~> AddSource1",
-				"lookup1 alterRow(updateIf(not(isNull(ExistingKey))),",
-				"     insertIf(isNull(ExistingKey))) ~> UpdateInsert",
 				"NewFile filter(or(not(isNull({FECHA OPERACIÓN})),not(isNull({IMPORTE EUR})))) ~> FilterNulls",
 				"AddSource1 select(mapColumn(",
 				"          ExistingKey = Key",
@@ -111,29 +97,8 @@
 				"RenameColumns, ExistingSetKeys lookup(Key == ExistingKey,",
 				"     multiple: false,",
 				"     pickup: 'any',",
-				"     broadcast: 'auto')~> lookup1",
-				"UpdateInsert sink(allowSchemaDrift: false,",
-				"     validateSchema: false,",
-				"     input(",
-				"          DateOperation as string,",
-				"          DateEffective as string,",
-				"          Description as string,",
-				"          Amount as string,",
-				"          Saldo as string",
-				"     ),",
-				"     partitionFileNames:['fulldatabasefile.csv'],",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     outputAssertFailedRows: true,",
-				"     assertFailure_container: 'blobcontainer',",
-				"     mapColumn(",
-				"          DateOperation,",
-				"          DateEffective,",
-				"          Description,",
-				"          Amount,",
-				"          Saldo",
-				"     ),",
-				"     partitionBy('hash', 1)) ~> WriteDown"
+				"     broadcast: 'auto')~> LookupExisting",
+				"AddSource1, LookupExisting union(byName: true)~> union1"
 			]
 		}
 	}
