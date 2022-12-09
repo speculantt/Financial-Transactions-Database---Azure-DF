@@ -27,9 +27,6 @@
 						"type": "DatasetReference"
 					},
 					"name": "sink1"
-				},
-				{
-					"name": "ExistingKeysSetCache"
 				}
 			],
 			"transformations": [
@@ -70,7 +67,10 @@
 					"name": "SelectExistingKeys"
 				},
 				{
-					"name": "filter1"
+					"name": "ExistingKeysOnly"
+				},
+				{
+					"name": "MapNewRecords"
 				}
 			],
 			"scriptLines": [
@@ -134,17 +134,21 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> select1",
-				"union1 split(and(Source==\"newfile\",isNull(ExistingKey)),",
+				"MapNewRecords split(and(Source==\"newfile\",isNull(ExistingKey)),",
 				"     and(Source==\"newfile\",ExistingKey==Key),",
 				"     and(Source==\"database\",isNull(ExistingKey)),",
-				"     and(Source==\"database\",not(isNull(ExistingKeysSetCache#lookup(Key)))),",
+				"     and(Source==\"database\",NewRecordKey==Key),",
 				"     disjoint: false) ~> ConditionalSplit@(NewRecords, UpdateRecords, UnchangedRecords, ToDeleteRecords, Others)",
 				"LookupExisting select(mapColumn(",
-				"          ExistingKey",
+				"          NewRecordKey = ExistingKey",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> SelectExistingKeys",
-				"SelectExistingKeys filter(not(isNull(ExistingKey))) ~> filter1",
+				"SelectExistingKeys filter(not(isNull(NewRecordKey))) ~> ExistingKeysOnly",
+				"union1, ExistingKeysOnly lookup(Key == NewRecordKey,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> MapNewRecords",
 				"select1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -164,15 +168,7 @@
 				"          Amount,",
 				"          Saldo",
 				"     ),",
-				"     partitionBy('hash', 1)) ~> sink1",
-				"filter1 sink(validateSchema: false,",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     keys:['ExistingKey'],",
-				"     store: 'cache',",
-				"     format: 'inline',",
-				"     output: false,",
-				"     saveOrder: 1) ~> ExistingKeysSetCache"
+				"     partitionBy('hash', 1)) ~> sink1"
 			]
 		}
 	}
