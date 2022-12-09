@@ -259,6 +259,21 @@
 							"name": "union1"
 						},
 						{
+							"name": "ConditionalSplit"
+						},
+						{
+							"name": "SelectExistingKeys"
+						},
+						{
+							"name": "ExistingKeysOnly"
+						},
+						{
+							"name": "MapNewRecords"
+						},
+						{
+							"name": "union2"
+						},
+						{
 							"name": "select1"
 						}
 					],
@@ -311,19 +326,32 @@
 						"     pickup: 'any',",
 						"     broadcast: 'auto')~> LookupExisting",
 						"AddSource1, LookupExisting union(byName: true)~> union1",
-						"union1 select(mapColumn(",
+						"MapNewRecords split(and(Source==\"newfile\",isNull(ExistingKey)),",
+						"     and(Source==\"newfile\",ExistingKey==Key),",
+						"     and(Source==\"database\",isNull(ExistingKey)),",
+						"     and(Source==\"database\",NewRecordKey==Key),",
+						"     disjoint: false) ~> ConditionalSplit@(NewRecords, UpdateRecords, UnchangedRecords, ToDeleteRecords, Others)",
+						"LookupExisting select(mapColumn(",
+						"          NewRecordKey = ExistingKey",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> SelectExistingKeys",
+						"SelectExistingKeys filter(not(isNull(NewRecordKey))) ~> ExistingKeysOnly",
+						"union1, ExistingKeysOnly lookup(Key == NewRecordKey,",
+						"     multiple: false,",
+						"     pickup: 'any',",
+						"     broadcast: 'auto')~> MapNewRecords",
+						"ConditionalSplit@NewRecords, ConditionalSplit@UpdateRecords, ConditionalSplit@UnchangedRecords union(byName: true)~> union2",
+						"union2 select(mapColumn(",
 						"          DateOperation,",
 						"          DateEffective,",
 						"          Description,",
 						"          Amount,",
-						"          Saldo,",
-						"          Key,",
-						"          Source,",
-						"          ExistingKey",
+						"          Saldo",
 						"     ),",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true) ~> select1",
-						"select1 sink(allowSchemaDrift: true,",
+						"select1 sink(allowSchemaDrift: false,",
 						"     validateSchema: false,",
 						"     input(",
 						"          DateOperation as string,",
@@ -335,13 +363,6 @@
 						"     partitionFileNames:['fulldatabasefile.csv'],",
 						"     skipDuplicateMapInputs: true,",
 						"     skipDuplicateMapOutputs: true,",
-						"     mapColumn(",
-						"          DateOperation,",
-						"          DateEffective,",
-						"          Description,",
-						"          Amount,",
-						"          Saldo",
-						"     ),",
 						"     partitionBy('hash', 1)) ~> sink1"
 					]
 				}
